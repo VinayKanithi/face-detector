@@ -1,0 +1,23 @@
+import cv2 as c
+face_cacade=c.CascadeClassifier('haarcascade_frontalface_default.xml')
+eye_cascade=c.CascadeClassifier('haarcascade_eye.xml')
+v=c.VideoCapture(0)
+while True:
+    ret,frame=v.read()
+    frame=c.resize(frame,(720,480))
+    grey=c.cvtColor(frame,c.COLOR_BGR2GRAY)
+    face=face_cacade.detectMultiScale(grey,1.1,5)
+    for (x,y,w,h) in face:
+        c.rectangle(frame,(x,y),(x+h,y+w),(255,0,255),3)
+        #region of insert for grey to detect eye
+        roi_grey=grey[y:y+h,x:x+w]
+        #region of insert for colour to dispaly shape on it
+        roi_img=frame[y:y+h,x:x+w]
+        eye=eye_cascade.detectMultiScale(roi_grey,1.1,5)
+        for (ex,ey,ew,eh) in eye:
+            c.circle(roi_img,(ex+27,ey+27),30,(255,0,0),2)
+    c.imshow("face detector",frame)
+    if c.waitKey(1) & 0xff==ord('q'):
+        break
+v.release()
+c.destroyAllWindows()
